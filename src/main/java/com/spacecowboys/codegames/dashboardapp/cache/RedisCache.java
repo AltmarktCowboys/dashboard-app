@@ -3,14 +3,21 @@ package com.spacecowboys.codegames.dashboardapp.cache;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import org.jboss.logging.Logger;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.Pipeline;
 import redis.clients.util.SafeEncoder;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by EDraser on 26.04.17.
  */
 public class RedisCache<Key, Payload> {
+
+    private static final Logger LOGGER = Logger.getLogger(RedisCache.class);
 
     private Class cls;
     private Class clsKey;
@@ -103,7 +110,12 @@ public class RedisCache<Key, Payload> {
     }
 
     private byte[] getNamespacesQueryString() {
-        String bf = String.format("%s#*", namespace);
+        String bf = String.format("%s#", namespace);
+        return getQueryString(bf);
+    }
+
+    private byte[] getQueryString(String pattern) {
+        String bf = String.format("%s*", pattern);
         return SafeEncoder.encode(bf);
     }
 
@@ -157,5 +169,30 @@ public class RedisCache<Key, Payload> {
         }
 
         return o != null ? (Payload) o.getValue() : null;
+    }
+
+    public List<Payload> list(String pattern) {
+        byte[] queryString = getQueryString(pattern);
+        List<Payload> result = new ArrayList<>();
+
+        try (Jedis redisResource = RedisInstance.getInstance().getResource()) {
+            Set<byte[]> bytes = redisResource.keys(queryString);
+
+            for (byte[] b : bytes) {
+                try {
+                    byte[] payload = redisResource.get(b);
+                    if (payload != null) {
+                        RedisObject redisObject = deserializeFromBytes(payload);
+                        Payload p = (Payload) redisObject.getValue();
+                        Key key = (Key) redisObject.getKey();
+                        result.add(p);
+                    }
+                } catch (Throwable e) {
+                    LOGGER.error(e.getMessage(), e);
+                }
+            }
+        }
+
+        return result;
     }
 }
