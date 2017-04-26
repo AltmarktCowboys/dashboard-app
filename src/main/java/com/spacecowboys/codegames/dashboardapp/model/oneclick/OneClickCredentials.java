@@ -1,6 +1,7 @@
-package com.spacecowboys.codegames.dashboardapp.api;
+package com.spacecowboys.codegames.dashboardapp.model.oneclick;
 
 import com.google.common.base.Strings;
+import com.spacecowboys.codegames.dashboardapp.configuration.Configuration;
 import com.spacecowboys.codegames.dashboardapp.tools.JSON;
 import org.apache.commons.io.IOUtils;
 import org.jboss.logging.Logger;
@@ -19,7 +20,7 @@ public class OneClickCredentials {
     private final String password;
     private final String oneClickUrl;
     private OAuthToken portalToken = null;
-    private final int REQUEST_TIMEOUT = 20000;
+    private String serviceUrl = null;
 
     public OneClickCredentials(String accessNumber, String loginName, String password, String oneClickUrl) {
         this.accessNumber = accessNumber;
@@ -40,8 +41,16 @@ public class OneClickCredentials {
         return password;
     }
 
+    public String getOneClickUrl() {
+        return oneClickUrl;
+    }
+
     public OAuthToken getPortalToken() {
         return portalToken;
+    }
+
+    public String getServiceUrl() {
+        return serviceUrl;
     }
 
     public OAuthToken auth() {
@@ -70,33 +79,23 @@ public class OneClickCredentials {
 
     private OAuthToken executeTokenRequest(String bodyString) throws Throwable {
 
-        String accessUrlLive = "https://services.portalbereich.de/ServiceHosts";
-        String accessUrlStaging = "https://services.portalbereich.de/ServiceHosts";
-        String accessUrlTwoClicks = "https://services.portalbereich.de/ServiceHosts";
-        String accessUrlThreeClicks = "https://services.portalbereich.de/ServiceHosts";
+        int timeout = Integer.parseInt(Configuration.getInstance().getOneClickTimeout());
 
-        String accessUrl = "";
-        {
-            String urllower = oneClickUrl.toLowerCase();
-            if(urllower.endsWith(".portalbereich.de") || urllower.endsWith(".one-click.de")) {
-                accessUrl = accessUrlLive;
-            } else if(urllower.endsWith(".addison51.de")) {
-                accessUrl = accessUrlStaging;
-            } else if(urllower.endsWith(".two-clicks.de")) {
-                accessUrl = accessUrlTwoClicks;
-            } else if(urllower.endsWith(".three-clicks.de")) {
-                accessUrl = accessUrlThreeClicks;
-            }
-        }
-        URL url = new URL(String.format("%1$s/authority/connect/token", accessUrl));
+        String tldomain = new URL(oneClickUrl).getHost();
+        tldomain = tldomain.substring(tldomain.indexOf('.'));
+
+        serviceUrl = oneClickUrl.substring(0, oneClickUrl.indexOf("://"))
+                + "://services" + tldomain + "/ServiceHosts";
+
+        URL url = new URL(String.format("%1$s/authority/connect/token", serviceUrl));
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setDoOutput(true);
         connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-        connection.setRequestProperty("Host", new URL(this.oneClickUrl).getHost());
+        connection.setRequestProperty("Host", new URL(oneClickUrl).getHost());
         connection.setRequestProperty("Authorization", "Basic cG9ydGFsOmFpcF9zZWNyZXQ=");
         connection.setRequestMethod("POST");
-        connection.setConnectTimeout(REQUEST_TIMEOUT);
-        connection.setReadTimeout(REQUEST_TIMEOUT);
+        connection.setConnectTimeout(timeout);
+        connection.setReadTimeout(timeout);
 
         try (OutputStreamWriter streamWriter = new OutputStreamWriter(connection.getOutputStream(), "UTF-8")) {
             streamWriter.write(bodyString);

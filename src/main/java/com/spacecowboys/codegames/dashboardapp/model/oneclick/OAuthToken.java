@@ -1,4 +1,4 @@
-package com.spacecowboys.codegames.dashboardapp.api;
+package com.spacecowboys.codegames.dashboardapp.model.oneclick;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

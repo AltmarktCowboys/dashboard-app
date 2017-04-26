@@ -8,6 +8,7 @@ import com.spacecowboys.codegames.dashboardapp.model.tiles.Tile;
 public class OneClickTile extends Tile {
 
     private String uri;
+    private String accessNumber;
     private String username;
     private String password;
 
@@ -17,6 +18,14 @@ public class OneClickTile extends Tile {
 
     public void setUri(String uri) {
         this.uri = uri;
+    }
+
+    public String getAccessNumber() {
+        return accessNumber;
+    }
+
+    public void setAccessNumber(String accessNumber) {
+        this.accessNumber = accessNumber;
     }
 
     public String getUsername() {

@@ -3,13 +3,14 @@ package com.spacecowboys.codegames.dashboardapp.model.oneclick;
 import com.google.common.base.Strings;
 import com.spacecowboys.codegames.dashboardapp.model.tiles.TileService;
 import com.spacecowboys.codegames.dashboardapp.tools.JSON;
-
-import java.util.UUID;
+import org.jboss.logging.Logger;
 
 /**
  * Created by EDraser on 26.04.17.
  */
 public class OneClickService {
+
+    private static final Logger LOGGER = Logger.getLogger(OneClickService.class);
 
     public OneClickContent getOneClickContent(OneClickTile tile) {
 
@@ -19,18 +20,38 @@ public class OneClickService {
         if (!Strings.isNullOrEmpty(cachedContent)) {
             session = JSON.fromString(cachedContent, OneClickContent.class);
         } else {
-            session = new OneClickContent();
-            session.setEmail("edwin.draser@wolterskluwer.com");
-            session.setId(UUID.randomUUID().toString());
-            session.setMemberType("client_postmaster");
-            session.setOrganizationId(UUID.randomUUID().toString());
-            session.setLoginName("edraser");
-            session.setSdnEnvironmentUrl("https://moveon.sdn.two-clicks.de");
-            session.setSessionId(UUID.randomUUID().toString());
+            OneClickPrincipal oneClickPrincipal = loadOneClickPrincipal(tile);
+            if(oneClickPrincipal != null) {
+                session = new OneClickContent();
+                session.setEmail(oneClickPrincipal.getEmail());
+                session.setId(oneClickPrincipal.getId());
+                session.setMemberType(oneClickPrincipal.getMemberType());
+                session.setOrganizationId(oneClickPrincipal.getOrganizationId());
+                session.setLoginName(oneClickPrincipal.getLoginName());
+                session.setSessionId(oneClickPrincipal.getSessionId());
 
-            tileService.setTileContent(tile.getId(), JSON.toString(session, OneClickContent.class));
+                tileService.setTileContent(tile.getId(), JSON.toString(session, OneClickContent.class));
+            }
+
         }
 
         return session;
+    }
+
+    private OneClickPrincipal loadOneClickPrincipal(OneClickTile oneClickTile) {
+
+        try {
+            OneClickCredentials oneClickCredentials =
+                    new OneClickCredentials(oneClickTile.getAccessNumber(),
+                            oneClickTile.getUsername(),
+                            oneClickTile.getPassword(),
+                            oneClickTile.getUri());
+            oneClickCredentials.auth();
+            OneClickPrincipal oneClickPrincipal = OneClickPrincipal.load(oneClickCredentials);
+            return oneClickPrincipal;
+        } catch (Exception e) {
+            LOGGER.debug("could not load OneClickPrincipal", e);
+        }
+        return null;
     }
 }

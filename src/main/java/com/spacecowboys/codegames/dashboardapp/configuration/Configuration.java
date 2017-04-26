@@ -33,6 +33,7 @@ public class Configuration {
     private String redisHost;
     private String redisPort;
 
+    private String oneClickTimeout;
     private String oneClickTestUrl;
     private String oneClickTestAccessNumber;
     private String oneClickTestLoginName;
@@ -53,6 +54,9 @@ public class Configuration {
         return INSTANCE;
     }
 
+    private Configuration() {
+    }
+
     private Configuration(Properties properties) {
 
         googleApiKey = properties.getProperty("googleApiKey");
@@ -67,6 +71,7 @@ public class Configuration {
         auth0Domain = properties.getProperty("auth0Domain");
         redisHost = properties.getProperty("redisHost");
         redisPort = properties.getProperty("redisPort");
+        oneClickTimeout = properties.getProperty("oneClickTimeout");
         oneClickTestUrl = properties.getProperty("oneClickTestUrl");
         oneClickTestAccessNumber = properties.getProperty("oneClickTestAccessNumber");
         oneClickTestLoginName = properties.getProperty("oneClickTestLoginName");
@@ -76,21 +81,23 @@ public class Configuration {
     private static Configuration createConfiguration() {
         try {
             Properties props = new Properties();
-            Configuration configuration;
+            Configuration configuration = new Configuration();
 
-            try (InputStream resourceAsStream = Configuration.class.getResourceAsStream("/defaults.conf")) {
+            final String embeddedDefaults = "/defaults.conf";
+            try (InputStream resourceAsStream = configuration.getClass().getResourceAsStream(embeddedDefaults)) {
                 if (resourceAsStream != null) {
                     props.load(resourceAsStream);
+                    LOGGER.info("default properties loaded from embedded resource file '" + embeddedDefaults + "'");
                 }
             }
 
             String path = System.getProperty("conf.path");
-            if(path != null) {
+            if (path != null) {
                 File file = new File(path);
                 if (file.exists() && file.isFile()) {
                     props.load(new StringReader(FileUtils.readFileToString(file)));
                     configuration = new Configuration(props);
-                    LOGGER.info("read configuration file '" + file.getPath() + "'");
+                    LOGGER.info("properties loaded from file '" + file.getPath() + "'");
                     return configuration;
                 }
             }
@@ -198,6 +205,14 @@ public class Configuration {
 
     public void setRedisPort(String redisPort) {
         this.redisPort = redisPort;
+    }
+
+    public String getOneClickTimeout() {
+        return oneClickTimeout;
+    }
+
+    public void setOneClickTimeout(String oneClickTimeout) {
+        this.oneClickTimeout = oneClickTimeout;
     }
 
     public String getOneClickTestUrl() {
