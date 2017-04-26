@@ -4,10 +4,7 @@ package com.spacecowboys.codegames.dashboardapp;
  * Created by EDraser on 25.04.17.
  */
 
-import com.spacecowboys.codegames.dashboardapp.api.DashboardController;
-import com.spacecowboys.codegames.dashboardapp.api.HelloWorldController;
-import com.spacecowboys.codegames.dashboardapp.api.OneClickTileController;
-import com.spacecowboys.codegames.dashboardapp.api.WeatherController;
+import com.spacecowboys.codegames.dashboardapp.api.*;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.ApplicationPath;
@@ -25,6 +22,7 @@ public class JaxRsApplication extends Application {
         classes.add(OneClickTileController.class);
         classes.add(DashboardController.class);
         classes.add(WeatherController.class);
+        classes.add(CORSFilter.class);
         return classes;
     }
 }
