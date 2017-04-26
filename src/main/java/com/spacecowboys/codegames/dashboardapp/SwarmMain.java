@@ -1,13 +1,20 @@
 package com.spacecowboys.codegames.dashboardapp;
 
 import com.spacecowboys.codegames.dashboardapp.api.CORSFilter;
+import com.spacecowboys.codegames.dashboardapp.api.DashboardController;
 import com.spacecowboys.codegames.dashboardapp.api.HelloWorldController;
+import com.spacecowboys.codegames.dashboardapp.api.OneClickTileController;
+import com.spacecowboys.codegames.dashboardapp.model.oneclick.OneClickTile;
+import com.spacecowboys.codegames.dashboardapp.model.tiles.Tile;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.wildfly.swarm.Swarm;
+import org.wildfly.swarm.config.JAXRS;
 import org.wildfly.swarm.config.logging.Level;
 import org.wildfly.swarm.jaxrs.JAXRSArchive;
 import org.wildfly.swarm.logging.LoggingFraction;
+import org.wildfly.swarm.spi.api.JARArchive;
 import org.wildfly.swarm.swagger.SwaggerArchive;
+import org.wildfly.swarm.undertow.WARArchive;
 
 
 /**
@@ -22,6 +29,7 @@ public class SwarmMain {
         JAXRSArchive deployment = ShrinkWrap.create(JAXRSArchive.class);
         registerResources(deployment);
         configureSwagger(deployment);
+        deployment.addAllDependencies();
 
         Level logLevel = Level.INFO;
         swarm.fraction(new LoggingFraction()
@@ -35,15 +43,14 @@ public class SwarmMain {
         SwaggerArchive archive = deployment.as(SwaggerArchive.class);
         // Tell swagger where our resources are
         archive.setResourcePackages("com.spacecowboys.codegames.dashboardapp.api");
-        archive.setTitle("My Awsome Dashboard API");
+        archive.setTitle("My Awesome Dashboard API");
     }
 
     /***
      * register all resources (endpoints) here
      * @param deployment
      */
-    private static void registerResources(JAXRSArchive deployment) {
-        deployment.addResource(HelloWorldController.class);
-        deployment.addResource(CORSFilter.class);
+    private static void registerResources(JAXRSArchive deployment) throws Exception {
+        deployment.addPackages(true, "com.spacecowboys.codegames.dashboardapp");
     }
 }
