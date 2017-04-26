@@ -71,9 +71,9 @@ public class Configuration {
             Properties props = new Properties();
             Configuration configuration;
 
-            try (InputStream resourceAsStream = Configuration.class.getResourceAsStream("/defaults.conf")) {
+            /*try (InputStream resourceAsStream = Configuration.class.getResourceAsStream("/defaults.conf")) {
                 props.load(resourceAsStream);
-            }
+            }*/
 
             String path = System.getProperty("conf.path");
             if(path != null) {
