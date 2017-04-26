@@ -8,7 +8,7 @@ import java.util.UUID;
 /**
  * Created by EDraser on 26.04.17.
  */
-public class OneClickSession {
+public class OneClickContent {
 
     // {
 // "Id":"c6a42c3c-c8b5-472a-a5ce-3ff2070130e5",

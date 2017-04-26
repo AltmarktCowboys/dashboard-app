@@ -90,7 +90,7 @@ public class Configuration {
         }
 
         LOGGER.warn("No configuration file provided! E.g. use -Dconf.path=/home/iam/mydashboard.conf. See resource default.conf for valid configuration keys.");
-        System.exit(1);
+        // System.exit(1);
         return new Configuration(new Properties());
     }
 

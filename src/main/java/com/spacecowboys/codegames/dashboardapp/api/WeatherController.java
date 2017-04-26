@@ -1,10 +1,12 @@
 package com.spacecowboys.codegames.dashboardapp.api;
 
 import com.google.common.base.Strings;
-import com.spacecowboys.codegames.dashboardapp.model.oneclick.OneClickService;
 import com.spacecowboys.codegames.dashboardapp.model.oneclick.OneClickContent;
-import com.spacecowboys.codegames.dashboardapp.model.oneclick.OneClickTile;
+import com.spacecowboys.codegames.dashboardapp.model.oneclick.OneClickService;
 import com.spacecowboys.codegames.dashboardapp.model.tiles.TileService;
+import com.spacecowboys.codegames.dashboardapp.model.weather.WeatherContent;
+import com.spacecowboys.codegames.dashboardapp.model.weather.WeatherService;
+import com.spacecowboys.codegames.dashboardapp.model.weather.WeatherTile;
 import io.swagger.annotations.ApiOperation;
 
 import javax.ws.rs.*;
@@ -15,8 +17,8 @@ import java.util.UUID;
 /**
  * Created by EDraser on 26.04.17.
  */
-@Path("/tile/oneclick")
-public class OneClickTileController {
+@Path("/tile/weather")
+public class WeatherController {
 
     @GET
     @Path("/{userId}/{tileId}")
@@ -25,8 +27,8 @@ public class OneClickTileController {
     public Response getTile(@PathParam("userId") String userId,
                             @PathParam("tileId") String tileId) {
 
-        TileService<OneClickTile> tileService = new TileService<>(userId, OneClickTile.class);
-        OneClickTile tile = tileService.getTile(userId, tileId);
+        TileService<WeatherTile> tileService = new TileService<>(userId, WeatherTile.class);
+        WeatherTile tile = tileService.getTile(userId, tileId);
         if (tile != null) {
             return Response.ok().entity(tile).build();
         }
@@ -39,7 +41,7 @@ public class OneClickTileController {
     public Response removeTile(@PathParam("userId") String userId,
                                @PathParam("tileId") String tileId) {
 
-        TileService<OneClickTile> tileService = new TileService<>(userId, OneClickTile.class);
+        TileService<WeatherTile> tileService = new TileService<>(userId, WeatherTile.class);
         tileService.removeTile(tileId);
 
         return Response.ok().build();
@@ -50,11 +52,12 @@ public class OneClickTileController {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response addTile(@PathParam("userId") String userId,
-                            OneClickTile tile) {
+                            WeatherTile tile) {
 
-        TileService<OneClickTile> tileService = new TileService<>(userId, OneClickTile.class);
+        TileService<WeatherTile> tileService = new TileService<>(userId, WeatherTile.class);
         if (Strings.isNullOrEmpty(tile.getId())) {
             tile.setId(UUID.randomUUID().toString());
+            tile.setTemplateId("weather");
         }
         tileService.putTile(tile);
 
@@ -65,9 +68,9 @@ public class OneClickTileController {
     @Path("/{userId}")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response updateTile(@PathParam("userId") String userId, OneClickTile tile) {
+    public Response updateTile(@PathParam("userId") String userId, WeatherTile tile) {
 
-        TileService<OneClickTile> tileService = new TileService<>(userId, OneClickTile.class);
+        TileService<WeatherTile> tileService = new TileService<>(userId, WeatherTile.class);
         if (Strings.isNullOrEmpty(tile.getId())) {
             tile.setId(UUID.randomUUID().toString());
         }
@@ -82,13 +85,13 @@ public class OneClickTileController {
     public Response getContent(@PathParam("userId") String userId,
                                @PathParam("tileId") String tileId) {
 
-        TileService<OneClickTile> tileService = new TileService<>(userId, OneClickTile.class);
-        OneClickTile tile = tileService.getTile(userId, tileId);
+        TileService<WeatherTile> tileService = new TileService<>(userId, WeatherTile.class);
+        WeatherTile tile = tileService.getTile(userId, tileId);
         if (tile != null) {
-            OneClickService oneClickService = new OneClickService();
-            OneClickContent oneClickContent = oneClickService.getOneClickContent(tile);
 
-            return Response.ok(oneClickContent).build();
+            WeatherService weatherService = new WeatherService(userId, tile);
+            WeatherContent content = weatherService.getContent();
+            return Response.ok(content).build();
         } else {
             return Response.status(Response.Status.NOT_FOUND).build();
         }

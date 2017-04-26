@@ -7,6 +7,7 @@ package com.spacecowboys.codegames.dashboardapp;
 import com.spacecowboys.codegames.dashboardapp.api.DashboardController;
 import com.spacecowboys.codegames.dashboardapp.api.HelloWorldController;
 import com.spacecowboys.codegames.dashboardapp.api.OneClickTileController;
+import com.spacecowboys.codegames.dashboardapp.api.WeatherController;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.ApplicationPath;
@@ -23,6 +24,7 @@ public class JaxRsApplication extends Application {
         classes.add(HelloWorldController.class);
         classes.add(OneClickTileController.class);
         classes.add(DashboardController.class);
+        classes.add(WeatherController.class);
         return classes;
     }
 }
