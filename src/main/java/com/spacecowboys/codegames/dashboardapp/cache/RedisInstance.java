@@ -1,5 +1,6 @@
 package com.spacecowboys.codegames.dashboardapp.cache;
 
+import com.spacecowboys.codegames.dashboardapp.configuration.Configuration;
 import org.jboss.logging.Logger;
 import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.Jedis;
@@ -43,12 +44,10 @@ public class RedisInstance {
         // Single host: "ip:port"
         // Multiple hosts: "firstIpHost:port secondIpHost:port thirdIpHost:port"
         // Not really a cluster solution (with replication), more like a weighted farm.
-        String host = "localhost";
-        int cachePort = 32768;
 
-        if (cachePort == 0) {
-            cachePort = 6379;
-        }
+        Configuration configuration = Configuration.getInstance();
+        String host = configuration.getRedisHost();
+        int cachePort = Integer.parseInt(configuration.getRedisPort());
 
         LOGGER.debug("redis server on host=" + host + " port=" + cachePort);
         HostAndPort hostInfo = getHostInfo(host, cachePort);

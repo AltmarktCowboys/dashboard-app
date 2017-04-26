@@ -49,6 +49,7 @@ crashlytics-build.properties
 fabric.properties
 
 *.class
+*env.SDNROOT}/
 target/
 out/
 logs/

@@ -17,8 +17,10 @@ import org.wildfly.swarm.swagger.SwaggerArchive;
  */
 public class SwarmMain {
     public static void main(String[] args) throws Exception {
-        Swarm swarm = new Swarm();
 
+        Swarm swarm = new Swarm(); // Always do this at first, since this also configures the logging stuff etc.
+
+        com.spacecowboys.codegames.dashboardapp.configuration.Configuration.getInstance();
         JAXRSArchive deployment = ShrinkWrap.create(JAXRSArchive.class);
         registerResources(deployment);
         configureSwagger(deployment);
