@@ -5,8 +5,6 @@ import com.spacecowboys.codegames.dashboardapp.model.tiles.TileService;
 import com.spacecowboys.codegames.dashboardapp.model.twitter.TwitterContent;
 import com.spacecowboys.codegames.dashboardapp.model.twitter.TwitterService;
 import com.spacecowboys.codegames.dashboardapp.model.twitter.TwitterTile;
-import com.spacecowboys.codegames.dashboardapp.model.weather.WeatherContent;
-import com.spacecowboys.codegames.dashboardapp.model.weather.WeatherService;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -55,8 +53,8 @@ public class TwitterController {
         TileService<TwitterTile> tileService = new TileService<>(userId, TwitterTile.class);
         if (Strings.isNullOrEmpty(tile.getId())) {
             tile.setId(UUID.randomUUID().toString());
-            tile.setTemplateId("twitter");
         }
+        tile.setTemplateId("twitter");
         tileService.putTile(tile);
 
         return Response.ok(tile).build();
@@ -69,9 +67,7 @@ public class TwitterController {
     public Response updateTile(@PathParam("userId") String userId, TwitterTile tile) {
 
         TileService<TwitterTile> tileService = new TileService<>(userId, TwitterTile.class);
-        if (Strings.isNullOrEmpty(tile.getId())) {
-            tile.setId(UUID.randomUUID().toString());
-        }
+        tile.setTemplateId("twitter");
         tileService.putTile(tile);
 
         return Response.ok(tile).build();

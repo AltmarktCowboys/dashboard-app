@@ -1,8 +1,6 @@
 package com.spacecowboys.codegames.dashboardapp.api;
 
 import com.google.common.base.Strings;
-import com.spacecowboys.codegames.dashboardapp.model.oneclick.OneClickContent;
-import com.spacecowboys.codegames.dashboardapp.model.oneclick.OneClickService;
 import com.spacecowboys.codegames.dashboardapp.model.tiles.TileService;
 import com.spacecowboys.codegames.dashboardapp.model.weather.WeatherContent;
 import com.spacecowboys.codegames.dashboardapp.model.weather.WeatherService;
@@ -47,6 +45,13 @@ public class WeatherController {
         return Response.ok().build();
     }
 
+    private void setDefaultValues(WeatherTile tile) {
+        if (Strings.isNullOrEmpty(tile.getId())) {
+            tile.setId(UUID.randomUUID().toString());
+        }
+        tile.setTemplateId("weather");
+    }
+
     @POST
     @Path("/{userId}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -55,10 +60,7 @@ public class WeatherController {
                             WeatherTile tile) {
 
         TileService<WeatherTile> tileService = new TileService<>(userId, WeatherTile.class);
-        if (Strings.isNullOrEmpty(tile.getId())) {
-            tile.setId(UUID.randomUUID().toString());
-            tile.setTemplateId("weather");
-        }
+        setDefaultValues(tile);
         tileService.putTile(tile);
 
         return Response.ok(tile).build();
@@ -71,9 +73,7 @@ public class WeatherController {
     public Response updateTile(@PathParam("userId") String userId, WeatherTile tile) {
 
         TileService<WeatherTile> tileService = new TileService<>(userId, WeatherTile.class);
-        if (Strings.isNullOrEmpty(tile.getId())) {
-            tile.setId(UUID.randomUUID().toString());
-        }
+        tile.setTemplateId("weather");
         tileService.putTile(tile);
 
         return Response.ok(tile).build();

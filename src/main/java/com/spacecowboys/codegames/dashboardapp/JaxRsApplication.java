@@ -24,6 +24,7 @@ public class JaxRsApplication extends Application {
         classes.add(WeatherController.class);
         classes.add(CORSFilter.class);
         classes.add(TwitterController.class);
+        classes.add(NewsController.class);
         return classes;
     }
 }

@@ -1,11 +1,10 @@
 package com.spacecowboys.codegames.dashboardapp.api;
 
 import com.google.common.base.Strings;
-import com.spacecowboys.codegames.dashboardapp.model.oneclick.OneClickContent;
-import com.spacecowboys.codegames.dashboardapp.model.oneclick.OneClickService;
-import com.spacecowboys.codegames.dashboardapp.model.oneclick.OneClickTile;
+import com.spacecowboys.codegames.dashboardapp.model.news.NewsContent;
+import com.spacecowboys.codegames.dashboardapp.model.news.NewsService;
+import com.spacecowboys.codegames.dashboardapp.model.news.NewsTile;
 import com.spacecowboys.codegames.dashboardapp.model.tiles.TileService;
-import io.swagger.annotations.ApiOperation;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -13,20 +12,19 @@ import javax.ws.rs.core.Response;
 import java.util.UUID;
 
 /**
- * Created by EDraser on 26.04.17.
+ * Created by EDraser on 27.04.17.
  */
-@Path("/tile/oneclick")
-public class OneClickTileController {
+@Path("/tile/news")
+public class NewsController {
 
     @GET
     @Path("/{userId}/{tileId}")
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "retrieves dashboard layout for given user", notes = "my notes", response = String.class)
     public Response getTile(@PathParam("userId") String userId,
                             @PathParam("tileId") String tileId) {
 
-        TileService<OneClickTile> tileService = new TileService<>(userId, OneClickTile.class);
-        OneClickTile tile = tileService.getTile(userId, tileId);
+        TileService<NewsTile> tileService = new TileService<>(userId, NewsTile.class);
+        NewsTile tile = tileService.getTile(userId, tileId);
         if (tile != null) {
             return Response.ok().entity(tile).build();
         }
@@ -39,7 +37,7 @@ public class OneClickTileController {
     public Response removeTile(@PathParam("userId") String userId,
                                @PathParam("tileId") String tileId) {
 
-        TileService<OneClickTile> tileService = new TileService<>(userId, OneClickTile.class);
+        TileService<NewsTile> tileService = new TileService<>(userId, NewsTile.class);
         tileService.removeTile(tileId);
 
         return Response.ok().build();
@@ -50,13 +48,13 @@ public class OneClickTileController {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response addTile(@PathParam("userId") String userId,
-                            OneClickTile tile) {
+                            NewsTile tile) {
 
-        TileService<OneClickTile> tileService = new TileService<>(userId, OneClickTile.class);
+        TileService<NewsTile> tileService = new TileService<>(userId, NewsTile.class);
         if (Strings.isNullOrEmpty(tile.getId())) {
             tile.setId(UUID.randomUUID().toString());
         }
-        tile.setTemplateId("oneclick");
+        tile.setTemplateId("news");
         tileService.putTile(tile);
 
         return Response.ok(tile).build();
@@ -66,10 +64,12 @@ public class OneClickTileController {
     @Path("/{userId}")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response updateTile(@PathParam("userId") String userId, OneClickTile tile) {
+    public Response updateTile(@PathParam("userId") String userId, NewsTile tile) {
 
-        TileService<OneClickTile> tileService = new TileService<>(userId, OneClickTile.class);
-        tile.setTemplateId("oneclick");
+        TileService<NewsTile> tileService = new TileService<>(userId, NewsTile.class);
+        if (Strings.isNullOrEmpty(tile.getId())) {
+            tile.setId(UUID.randomUUID().toString());
+        }
         tileService.putTile(tile);
 
         return Response.ok(tile).build();
@@ -81,13 +81,12 @@ public class OneClickTileController {
     public Response getContent(@PathParam("userId") String userId,
                                @PathParam("tileId") String tileId) {
 
-        TileService<OneClickTile> tileService = new TileService<>(userId, OneClickTile.class);
-        OneClickTile tile = tileService.getTile(userId, tileId);
+        TileService<NewsTile> tileService = new TileService<>(userId, NewsTile.class);
+        NewsTile tile = tileService.getTile(userId, tileId);
         if (tile != null) {
-            OneClickService oneClickService = new OneClickService();
-            OneClickContent oneClickContent = oneClickService.getOneClickContent(tile);
-
-            return Response.ok(oneClickContent).build();
+            NewsService newsService = new NewsService(userId, tile);
+            NewsContent content = newsService.getContent();
+            return Response.ok(content).build();
         } else {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
