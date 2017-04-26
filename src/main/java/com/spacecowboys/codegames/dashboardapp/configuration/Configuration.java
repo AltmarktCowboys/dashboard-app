@@ -33,6 +33,11 @@ public class Configuration {
     private String redisHost;
     private String redisPort;
 
+    private String oneClickTestUrl;
+    private String oneClickTestAccessNumber;
+    private String oneClickTestLoginName;
+    private String oneClickTestPassword;
+
     private static Configuration INSTANCE;
 
     public static Configuration getInstance() {
@@ -48,22 +53,24 @@ public class Configuration {
         return INSTANCE;
     }
 
-    private Configuration() {}
+    private Configuration(Properties properties) {
 
-    private Configuration(Properties defaultProperties) {
-
-        googleApiKey = defaultProperties.getProperty("googleApiKey");
-        twitterAccessToken = defaultProperties.getProperty("twitterAccessToken");
-        twitterTokenSecret = defaultProperties.getProperty("twitterTokenSecret");
-        twitterConsumerKey = defaultProperties.getProperty("twitterConsumerKey");
-        twitterConsumerSecret = defaultProperties.getProperty("twitterConsumerSecret");
-        weatherClientId = defaultProperties.getProperty("weatherClientId");
-        weatherClientSecret = defaultProperties.getProperty("weatherClientSecret");
-        auth0ClientId = defaultProperties.getProperty("auth0ClientId");
-        auth0ClientSecret = defaultProperties.getProperty("auth0ClientSecret");
-        auth0Domain = defaultProperties.getProperty("auth0Domain");
-        redisHost = defaultProperties.getProperty("redisHost");
-        redisPort = defaultProperties.getProperty("redisPort");
+        googleApiKey = properties.getProperty("googleApiKey");
+        twitterAccessToken = properties.getProperty("twitterAccessToken");
+        twitterTokenSecret = properties.getProperty("twitterTokenSecret");
+        twitterConsumerKey = properties.getProperty("twitterConsumerKey");
+        twitterConsumerSecret = properties.getProperty("twitterConsumerSecret");
+        weatherClientId = properties.getProperty("weatherClientId");
+        weatherClientSecret = properties.getProperty("weatherClientSecret");
+        auth0ClientId = properties.getProperty("auth0ClientId");
+        auth0ClientSecret = properties.getProperty("auth0ClientSecret");
+        auth0Domain = properties.getProperty("auth0Domain");
+        redisHost = properties.getProperty("redisHost");
+        redisPort = properties.getProperty("redisPort");
+        oneClickTestUrl = properties.getProperty("oneClickTestUrl");
+        oneClickTestAccessNumber = properties.getProperty("oneClickTestAccessNumber");
+        oneClickTestLoginName = properties.getProperty("oneClickTestLoginName");
+        oneClickTestPassword = properties.getProperty("oneClickTestPassword");
     }
 
     private static Configuration createConfiguration() {
@@ -71,9 +78,9 @@ public class Configuration {
             Properties props = new Properties();
             Configuration configuration;
 
-            /*try (InputStream resourceAsStream = Configuration.class.getResourceAsStream("/defaults.conf")) {
+            try (InputStream resourceAsStream = Configuration.class.getResourceAsStream("/defaults.conf")) {
                 props.load(resourceAsStream);
-            }*/
+            }
 
             String path = System.getProperty("conf.path");
             if(path != null) {
@@ -189,5 +196,37 @@ public class Configuration {
 
     public void setRedisPort(String redisPort) {
         this.redisPort = redisPort;
+    }
+
+    public String getOneClickTestUrl() {
+        return oneClickTestUrl;
+    }
+
+    public void setOneClickTestUrl(String oneClickTestUrl) {
+        this.oneClickTestUrl = oneClickTestUrl;
+    }
+
+    public String getOneClickTestAccessNumber() {
+        return oneClickTestAccessNumber;
+    }
+
+    public void setOneClickTestAccessNumber(String oneClickTestAccessNumber) {
+        this.oneClickTestAccessNumber = oneClickTestAccessNumber;
+    }
+
+    public String getOneClickTestLoginName() {
+        return oneClickTestLoginName;
+    }
+
+    public void setOneClickTestLoginName(String oneClickTestLoginName) {
+        this.oneClickTestLoginName = oneClickTestLoginName;
+    }
+
+    public String getOneClickTestPassword() {
+        return oneClickTestPassword;
+    }
+
+    public void setOneClickTestPassword(String oneClickTestPassword) {
+        this.oneClickTestPassword = oneClickTestPassword;
     }
 }

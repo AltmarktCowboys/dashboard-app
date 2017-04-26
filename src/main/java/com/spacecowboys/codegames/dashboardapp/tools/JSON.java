@@ -1,15 +1,30 @@
 package com.spacecowboys.codegames.dashboardapp.tools;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
-import com.spacecowboys.codegames.dashboardapp.cache.RedisObject;
-import redis.clients.util.SafeEncoder;
+
+import java.io.IOException;
 
 /**
  * Created by EDraser on 26.04.17.
  */
 public class JSON {
+
+    private static ObjectMapper mapper = null;
+
+    private static ObjectMapper getMapper() {
+        if (mapper == null) {
+            synchronized (JSON.class) {
+                if (mapper == null) {
+                    mapper = new ObjectMapper();
+                    mapper.registerModule(new JaxbAnnotationModule());
+                }
+            }
+        }
+        return mapper;
+    }
 
     public static <T> T fromString(String content, Class<T> tClass) {
 
@@ -27,5 +42,9 @@ public class JSON {
         String jsonObject = gsonBuilder.create().toJson(object, tClass);
 
         return jsonObject;
+    }
+
+    static public <T> T read(byte[] data, Class<T> cls) throws IOException {
+        return getMapper().readValue(data, cls);
     }
 }
