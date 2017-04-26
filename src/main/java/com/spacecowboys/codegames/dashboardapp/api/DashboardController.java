@@ -26,20 +26,22 @@ public class DashboardController {
     @ApiOperation(value = "retrieves dashboard layout for given user", notes = "my notes", response = String.class)
     public Response getDashboardLayout(@PathParam("userId") String userId) {
 
+        DashboardContract dashboardContract = new DashboardContract();
+        dashboardContract.setUserId(userId);
+
         DashboardLayoutService dashboardLayoutService = new DashboardLayoutService(userId);
         DashboardLayout dashboardLayout = dashboardLayoutService.get();
         if (dashboardLayout != null) {
-            TileService<Tile> tileService = new TileService<>(userId, Tile.class);
-            List<Tile> tiles = tileService.retrieveTiles();
-
-            DashboardContract dashboardContract = new DashboardContract();
             dashboardContract.setLayout(dashboardLayout.getContent());
-            dashboardContract.getTiles().addAll(tiles);
-
-            return Response.ok().entity(dashboardContract).build();
         }
 
-        return Response.status(Response.Status.NOT_FOUND).build();
+        TileService<Tile> tileService = new TileService<>(userId, Tile.class);
+        List<Tile> tiles = tileService.retrieveTiles();
+        if (tiles.size() > 0) {
+            dashboardContract.getTiles().addAll(tiles);
+        }
+
+        return Response.ok().entity(dashboardContract).build();
     }
 
 

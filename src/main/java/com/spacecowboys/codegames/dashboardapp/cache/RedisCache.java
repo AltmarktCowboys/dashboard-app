@@ -115,7 +115,7 @@ public class RedisCache<Key, Payload> {
     }
 
     private byte[] getQueryString(String pattern) {
-        String bf = String.format("%s*", pattern);
+        String bf = String.format("%s#%s*", namespace, pattern);
         return SafeEncoder.encode(bf);
     }
 

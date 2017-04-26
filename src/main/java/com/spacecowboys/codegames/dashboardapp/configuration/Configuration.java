@@ -38,7 +38,7 @@ public class Configuration {
     private String oneClickTestLoginName;
     private String oneClickTestPassword;
 
-    private static Configuration INSTANCE;
+    private static volatile Configuration INSTANCE;
 
     public static Configuration getInstance() {
         if (INSTANCE == null) {
@@ -78,9 +78,11 @@ public class Configuration {
             Properties props = new Properties();
             Configuration configuration;
 
-            /*try (InputStream resourceAsStream = Configuration.class.getResourceAsStream("/defaults.conf")) {
-                props.load(resourceAsStream);
-            }*/
+            try (InputStream resourceAsStream = Configuration.class.getResourceAsStream("/defaults.conf")) {
+                if (resourceAsStream != null) {
+                    props.load(resourceAsStream);
+                }
+            }
 
             String path = System.getProperty("conf.path");
             if(path != null) {
