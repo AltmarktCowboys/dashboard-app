@@ -13,13 +13,18 @@ public class CacheProvider {
         return caches;
     }
 
+    private static <Payload> String getKey(String name, Class<Payload> clsKey) {
+
+        return String.format("%s_%s", name, clsKey.getSimpleName());
+    }
+
     public static <Key, Payload> RedisCache<Key, Payload> getCache(String name, Class<Payload> cls, Class<Key> clsKey) {
-        RedisCache<Key, Payload> cache = getCaches().get(name);
+        RedisCache<Key, Payload> cache = getCaches().get(getKey(name, cls));
 
         if (cache == null) {
             cache = new RedisCache<>();
             cache.setName(name, cls, clsKey);
-            getCaches().put(name, cache);
+            getCaches().put(getKey(name, cls), cache);
         }
 
         return cache;
