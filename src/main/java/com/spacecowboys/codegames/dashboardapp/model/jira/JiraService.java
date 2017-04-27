@@ -43,7 +43,7 @@ public class JiraService {
             try {
                 JiraRestClientFactory factory = new AsynchronousJiraRestClientFactory();
                 URI uri = new URI(tile.getJiraUrl());
-                JiraRestClient client = factory.createWithBasicHttpAuthentication(uri, "issue-daemon", "SdnBase123!");
+                JiraRestClient client = factory.createWithBasicHttpAuthentication(uri, tile.getUsername(), tile.getPassword());
 
                 Promise<User> userPromise = client.getUserClient().getUser(tile.getUsername());
                 User user = userPromise.claim();
