@@ -2,15 +2,15 @@ package com.spacecowboys.codegames.dashboardapp.model.oneclick;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.base.Strings;
+import com.google.common.base.Charsets;
 import com.spacecowboys.codegames.dashboardapp.configuration.Configuration;
 import com.spacecowboys.codegames.dashboardapp.tools.JSON;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.jboss.logging.Logger;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.UUID;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OneClickPrincipal {
@@ -47,12 +47,7 @@ public class OneClickPrincipal {
     private String memberType;
     private String sdnEnvironmentUrl;
     private String allowedFileTypes;
-
-    private transient UUID organizationUUID;
-    private transient UUID sessionUUID;
-    private transient Boolean shouldChangePassword;
-    private transient Boolean shouldConfirmEmail;
-    private transient Boolean hasAvatar;
+    private transient String directLink;
 
     @JsonProperty("Id")
     public String getId() {
@@ -184,41 +179,6 @@ public class OneClickPrincipal {
         this.allowedFileTypes = allowedFileTypes;
     }
 
-    public UUID getOrganizationIdAsUuid() {
-        if (organizationUUID == null && !Strings.isNullOrEmpty(organizationId)) {
-            organizationUUID = UUID.fromString(organizationId);
-        }
-        return organizationUUID;
-    }
-
-    public UUID getSessionAsUuid() {
-        if (sessionUUID == null && !Strings.isNullOrEmpty(sessionId)) {
-            sessionUUID = UUID.fromString(sessionId);
-        }
-        return sessionUUID;
-    }
-
-    public Boolean shouldChangePassword() {
-        if (shouldChangePassword == null && !Strings.isNullOrEmpty(getIsChangePassword())) {
-            shouldChangePassword = Boolean.valueOf(getIsChangePassword());
-        }
-        return shouldChangePassword;
-    }
-
-    public Boolean shouldConfirmEmail() {
-        if (shouldConfirmEmail == null && !Strings.isNullOrEmpty(getIsConfirmEmail())) {
-            shouldConfirmEmail = Boolean.valueOf(getIsConfirmEmail());
-        }
-        return shouldConfirmEmail;
-    }
-
-    public Boolean hasAvatar() {
-        if (isAvatar == null && !Strings.isNullOrEmpty(getIsAvatar())) {
-            hasAvatar = Boolean.valueOf(getIsAvatar());
-        }
-        return hasAvatar;
-    }
-
     public static OneClickPrincipal load(OneClickCredentials oneClickCredentials) throws Exception {
 
         int timeout = Integer.parseInt(Configuration.getInstance().getOneClickTimeout());
@@ -240,6 +200,75 @@ public class OneClickPrincipal {
         }
         byte[] bytes = IOUtils.toByteArray(connection.getInputStream());
         OneClickPrincipal principal =  JSON.read(bytes, OneClickPrincipal.class);
+
+        principal.directLink = buildDirectLink(principal, oneClickCredentials);
+
         return principal;
+    }
+
+    private static String getHex( byte[] raw ) {
+        final String HEXES = "0123456789abcdef";
+
+        if ( (raw == null) || (raw.length == 0) ) {
+            return null;
+        }
+
+        final StringBuilder hex = new StringBuilder( 2 * raw.length );
+        for ( final byte b : raw ) {
+            hex.append(HEXES.charAt((b & 0xF0) >> 4)).append(HEXES.charAt((b & 0x0F)));
+        }
+
+        return hex.toString();
+    }
+
+    private static String buildDirectLink(OneClickPrincipal oneClickPrincipal, OneClickCredentials oneClickCredentials) {
+
+        try {
+            /*
+            long TICKS_AT_EPOCH = 621355968000000000L;
+            long ticks = System.currentTimeMillis() * 10000 + TICKS_AT_EPOCH;
+
+            byte[] key = new byte[16];
+            key[0] = 43;
+            key[1] = (byte)245;
+            key[2] = 91;
+            key[3] = 92;
+            key[4] = (byte)159;
+            key[5] = (byte)131;
+            key[6] = (byte)202;
+            key[7] = (byte)132;
+            key[8] = (byte)100;
+            key[9] = (byte)118;
+            key[10] = (byte)186;
+            key[11] = (byte)121;
+            key[12]	= (byte)150;
+            key[13]	= 36;
+            key[14]	= 98;
+            key[15]	= (byte)174;
+
+            String textToEncrypt = String.format("%d_%s", ticks, oneClickPrincipal.getId());
+            */
+
+            String textToEncrypt = oneClickPrincipal.getId();
+            //Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            //cipher.init(Cipher.ENCRYPT_MODE,  new SecretKeySpec(key, "AES"), new IvParameterSpec(key));
+
+            //byte[] textToEncryptUft8Bytes = textToEncrypt.getBytes(Charsets.UTF_8);
+            //byte[] cryptedBytes = cipher.doFinal(textToEncryptUft8Bytes);
+            //String encodedBase64String = Base64.encodeBase64String(cryptedBytes);
+            
+            String encodedBase64String =  Base64.encodeBase64String(textToEncrypt.getBytes(Charsets.UTF_8));
+            String link = String.format("%s?nid=%s", oneClickCredentials.getOneClickUrl(), encodedBase64String);
+            return link;
+
+        } catch (Exception e) {
+            LOGGER.debug("could not build directlink", e);
+        }
+
+        return null;
+    }
+
+    public String getDirectLink() {
+        return directLink;
     }
 }

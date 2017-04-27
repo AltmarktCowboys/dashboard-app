@@ -14,31 +14,22 @@ public class OneClickService {
 
     public OneClickContent getOneClickContent(OneClickTile tile) {
 
-        OneClickContent session = null;
+        OneClickContent oneClickContent = null;
         TileService<OneClickTile> tileService = new TileService<>(tile.getUserId(), OneClickTile.class);
         String cachedContent = tileService.getTileContent(tile.getId());
         if (!Strings.isNullOrEmpty(cachedContent)) {
-            session = JSON.fromString(cachedContent, OneClickContent.class);
+            oneClickContent = JSON.fromString(cachedContent, OneClickContent.class);
         } else {
-            OneClickPrincipal oneClickPrincipal = loadOneClickPrincipal(tile);
-            if(oneClickPrincipal != null) {
-                session = new OneClickContent();
-                session.setEmail(oneClickPrincipal.getEmail());
-                session.setId(oneClickPrincipal.getId());
-                session.setMemberType(oneClickPrincipal.getMemberType());
-                session.setOrganizationId(oneClickPrincipal.getOrganizationId());
-                session.setLoginName(oneClickPrincipal.getLoginName());
-                session.setSessionId(oneClickPrincipal.getSessionId());
-
-                tileService.setTileContent(tile.getId(), JSON.toString(session, OneClickContent.class));
+            oneClickContent = loadOneClickContent(tile);
+            if(oneClickContent != null) {
+                tileService.setTileContent(tile.getId(), JSON.toString(oneClickContent, OneClickContent.class));
             }
-
         }
 
-        return session;
+        return oneClickContent;
     }
 
-    private OneClickPrincipal loadOneClickPrincipal(OneClickTile oneClickTile) {
+    private OneClickContent loadOneClickContent(OneClickTile oneClickTile) {
 
         try {
             OneClickCredentials oneClickCredentials =
@@ -47,11 +38,24 @@ public class OneClickService {
                             oneClickTile.getPassword(),
                             oneClickTile.getUri());
             oneClickCredentials.auth();
+            
             OneClickPrincipal oneClickPrincipal = OneClickPrincipal.load(oneClickCredentials);
-            return oneClickPrincipal;
+
+            OneClickContent oneClickContent = new OneClickContent();
+            oneClickContent.setEmail(oneClickPrincipal.getEmail());
+            oneClickContent.setId(oneClickPrincipal.getId());
+            oneClickContent.setMemberType(oneClickPrincipal.getMemberType());
+            oneClickContent.setOrganizationId(oneClickPrincipal.getOrganizationId());
+            oneClickContent.setLoginName(oneClickPrincipal.getLoginName());
+            oneClickContent.setSessionId(oneClickPrincipal.getSessionId());
+            oneClickContent.setDirectLink(oneClickPrincipal.getDirectLink());
+
+            return oneClickContent;
+
         } catch (Exception e) {
-            LOGGER.debug("could not load OneClickPrincipal", e);
+            LOGGER.debug("could not load OneClickContent", e);
         }
         return null;
     }
+
 }
