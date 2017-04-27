@@ -244,7 +244,7 @@ public class OneClickPrincipal {
             return link;
 
         } catch (Exception e) {
-            LOGGER.debug("could not build directlink", e);
+            LOGGER.info("could not build directlink", e);
         }
 
         return null;

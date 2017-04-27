@@ -86,8 +86,11 @@ public class OneClickTileController {
         if (tile != null) {
             OneClickService oneClickService = new OneClickService();
             OneClickContent oneClickContent = oneClickService.getOneClickContent(tile);
-
-            return Response.ok(oneClickContent).build();
+            if(oneClickContent == null) {
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+            Response response = Response.ok(oneClickContent).build();
+            return response;
         } else {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
