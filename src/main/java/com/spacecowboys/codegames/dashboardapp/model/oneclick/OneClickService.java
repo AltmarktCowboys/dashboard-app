@@ -37,23 +37,25 @@ public class OneClickService {
                             oneClickTile.getUsername(),
                             oneClickTile.getPassword(),
                             oneClickTile.getUri());
-            oneClickCredentials.auth();
-            
-            OneClickPrincipal oneClickPrincipal = OneClickPrincipal.load(oneClickCredentials);
 
-            OneClickContent oneClickContent = new OneClickContent();
-            oneClickContent.setEmail(oneClickPrincipal.getEmail());
-            oneClickContent.setId(oneClickPrincipal.getId());
-            oneClickContent.setMemberType(oneClickPrincipal.getMemberType());
-            oneClickContent.setOrganizationId(oneClickPrincipal.getOrganizationId());
-            oneClickContent.setLoginName(oneClickPrincipal.getLoginName());
-            oneClickContent.setSessionId(oneClickPrincipal.getSessionId());
-            oneClickContent.setDirectLink(oneClickPrincipal.getDirectLink());
+            if(oneClickCredentials.auth() != null) {
 
-            return oneClickContent;
+                OneClickPrincipal oneClickPrincipal = OneClickPrincipal.load(oneClickCredentials);
+
+                OneClickContent oneClickContent = new OneClickContent();
+                oneClickContent.setEmail(oneClickPrincipal.getEmail());
+                oneClickContent.setId(oneClickPrincipal.getId());
+                oneClickContent.setMemberType(oneClickPrincipal.getMemberType());
+                oneClickContent.setOrganizationId(oneClickPrincipal.getOrganizationId());
+                oneClickContent.setLoginName(oneClickPrincipal.getLoginName());
+                oneClickContent.setSessionId(oneClickPrincipal.getSessionId());
+                oneClickContent.setDirectLink(oneClickPrincipal.getDirectLink());
+
+                return oneClickContent;
+            }
 
         } catch (Exception e) {
-            LOGGER.debug("could not load OneClickContent", e);
+            LOGGER.info("could not load OneClickContent", e);
         }
         return null;
     }

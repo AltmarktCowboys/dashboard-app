@@ -71,7 +71,7 @@ public class OneClickCredentials {
             portalToken = token;
             return token;
         } catch(Throwable throwable) {
-            LOGGER.debug(throwable.getMessage(), throwable);
+            LOGGER.info(throwable.getMessage(), throwable);
         }
 
         return null;
