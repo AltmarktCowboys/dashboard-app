@@ -55,9 +55,11 @@ public class JiraService {
                     JiraIssue jiraIssue = new JiraIssue();
                     jiraIssue.setKey(issue.getKey());
                     jiraIssue.setPriority(issue.getPriority().getName());
-                    jiraIssue.setState(issue.getStatus().getDescription());
+                    jiraIssue.setState(issue.getStatus().getName());
                     jiraIssue.setSummary(issue.getSummary());
                     jiraIssue.setUrl(issue.getSelf().toString());
+
+                    content.getIssues().add(jiraIssue);
                 }
 
             } catch (Throwable e) {
