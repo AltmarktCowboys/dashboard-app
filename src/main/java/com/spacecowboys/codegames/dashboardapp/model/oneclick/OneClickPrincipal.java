@@ -250,6 +250,7 @@ public class OneClickPrincipal {
         return null;
     }
 
+    @JsonProperty("DirectLink")
     public String getDirectLink() {
         return directLink;
     }
