@@ -9,6 +9,10 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.jboss.logging.Logger;
 
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+import java.io.FileInputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -205,59 +209,37 @@ public class OneClickPrincipal {
 
         return principal;
     }
+    
+    private static String cryptAndEncodeBase64(String textToEncrypt) throws Exception {
 
-    private static String getHex( byte[] raw ) {
-        final String HEXES = "0123456789abcdef";
-
-        if ( (raw == null) || (raw.length == 0) ) {
-            return null;
+        byte[] key = null;
+        try (FileInputStream input = new FileInputStream(Configuration.getInstance().getOneClickKeyPath())) {
+            if(input != null) {
+                key = IOUtils.toByteArray(input);
+            }
         }
 
-        final StringBuilder hex = new StringBuilder( 2 * raw.length );
-        for ( final byte b : raw ) {
-            hex.append(HEXES.charAt((b & 0xF0) >> 4)).append(HEXES.charAt((b & 0x0F)));
-        }
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        cipher.init(Cipher.ENCRYPT_MODE,  new SecretKeySpec(key, "AES"), new IvParameterSpec(key));
 
-        return hex.toString();
-    }
+        byte[] textToEncryptUft8Bytes = textToEncrypt.getBytes(Charsets.UTF_8);
+        byte[] cryptedBytes = cipher.doFinal(textToEncryptUft8Bytes);
+        String encodedBase64String = Base64.encodeBase64String(cryptedBytes);
+        return encodedBase64String;
+    } 
 
     private static String buildDirectLink(OneClickPrincipal oneClickPrincipal, OneClickCredentials oneClickCredentials) {
 
         try {
-            /*
             long TICKS_AT_EPOCH = 621355968000000000L;
             long ticks = System.currentTimeMillis() * 10000 + TICKS_AT_EPOCH;
-
-            byte[] key = new byte[16];
-            key[0] = 43;
-            key[1] = (byte)245;
-            key[2] = 91;
-            key[3] = 92;
-            key[4] = (byte)159;
-            key[5] = (byte)131;
-            key[6] = (byte)202;
-            key[7] = (byte)132;
-            key[8] = (byte)100;
-            key[9] = (byte)118;
-            key[10] = (byte)186;
-            key[11] = (byte)121;
-            key[12]	= (byte)150;
-            key[13]	= 36;
-            key[14]	= 98;
-            key[15]	= (byte)174;
-
-            String textToEncrypt = String.format("%d_%s", ticks, oneClickPrincipal.getId());
-            */
-
+            // example: 636288768009520635_bbc52049-78a6-4f04-9191-cfbb29d8aaa0
+            //String textToEncrypt = String.format("%d_%s", ticks, oneClickPrincipal.getId());
             String textToEncrypt = oneClickPrincipal.getId();
-            //Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-            //cipher.init(Cipher.ENCRYPT_MODE,  new SecretKeySpec(key, "AES"), new IvParameterSpec(key));
 
-            //byte[] textToEncryptUft8Bytes = textToEncrypt.getBytes(Charsets.UTF_8);
-            //byte[] cryptedBytes = cipher.doFinal(textToEncryptUft8Bytes);
-            //String encodedBase64String = Base64.encodeBase64String(cryptedBytes);
+            //String encodedBase64String = cryptAndEncodeBase64(textToEncrypt);
             
-            String encodedBase64String =  Base64.encodeBase64String(textToEncrypt.getBytes(Charsets.UTF_8));
+            String encodedBase64String = Base64.encodeBase64String(textToEncrypt.getBytes(Charsets.UTF_8));
             String link = String.format("%s?nid=%s", oneClickCredentials.getOneClickUrl(), encodedBase64String);
             return link;
 

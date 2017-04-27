@@ -33,6 +33,7 @@ public class Configuration {
     private String redisHost;
     private String redisPort;
 
+    private String oneClickKeyPath;
     private String oneClickTimeout;
     private String oneClickTestUrl;
     private String oneClickTestAccessNumber;
@@ -71,6 +72,7 @@ public class Configuration {
         auth0Domain = properties.getProperty("auth0Domain");
         redisHost = properties.getProperty("redisHost");
         redisPort = properties.getProperty("redisPort");
+        oneClickKeyPath = properties.getProperty("oneClickKeyPath");
         oneClickTimeout = properties.getProperty("oneClickTimeout");
         oneClickTestUrl = properties.getProperty("oneClickTestUrl");
         oneClickTestAccessNumber = properties.getProperty("oneClickTestAccessNumber");
@@ -205,6 +207,14 @@ public class Configuration {
 
     public void setRedisPort(String redisPort) {
         this.redisPort = redisPort;
+    }
+
+    public String getOneClickKeyPath() {
+        return oneClickKeyPath;
+    }
+
+    public void setOneClickKeyPath(String oneClickKeyPath) {
+        this.oneClickKeyPath = oneClickKeyPath;
     }
 
     public String getOneClickTimeout() {
