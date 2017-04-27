@@ -5,24 +5,26 @@ package com.spacecowboys.codegames.dashboardapp.model.jira;
  */
 public class JiraIssue {
 
-    private String name;
-    private String title;
+    private String key;
+    private String summary;
     private String url;
+    private String priority;
+    private String state;
 
-    public String getName() {
-        return name;
+    public String getKey() {
+        return key;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setKey(String key) {
+        this.key = key;
     }
 
-    public String getTitle() {
-        return title;
+    public String getSummary() {
+        return summary;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setSummary(String summary) {
+        this.summary = summary;
     }
 
     public String getUrl() {
@@ -31,5 +33,21 @@ public class JiraIssue {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getPriority() {
+        return priority;
+    }
+
+    public void setPriority(String priority) {
+        this.priority = priority;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
     }
 }
