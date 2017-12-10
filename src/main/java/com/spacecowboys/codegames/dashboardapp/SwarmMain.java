@@ -46,6 +46,7 @@ public class SwarmMain {
         // Tell swagger where our resources are
         archive.setResourcePackages("com.spacecowboys.codegames.dashboardapp.api");
         archive.setTitle("My Awesome Dashboard API");
+        archive.setHost("localhost:8080");
     }
 
     /***
